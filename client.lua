@@ -33,7 +33,6 @@ function Fishing()
         while not HasAnimDictLoaded('amb@world_human_stand_fishing@idle_a') do 
             Citizen.Wait(1) 
         end
-    -- rod = AttachEntityToPed('prop_fishing_rod_01',60309, 0,0,0, 0,0,0)
 
     local playerPed = PlayerPedId()
 	local BoneID = GetPedBoneIndex(playerPed, 60309)
@@ -41,37 +40,11 @@ function Fishing()
 	
     AttachEntityToEntity(rod, playerPed, BoneID, 0, 0, 0, 0, 0, 0, false, false, false, false, 2, true)
     TaskPlayAnim(playerPed, 'amb@world_human_stand_fishing@idle_a', 'idle_b', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
-    -- DrawTextText()
     FishingActive()
 end
 
--- function RNG()
---     while isFishing do
---         Wait(math.random(13000, 32000))
---         CatchFish()
---         ClearPedTasks(PlayerPedId())
---         DeleteObject(rod)
---         DeleteEntity(rod)
---         break
---     end
---     while not isFishing do
---         CatchFish()
---         break
---     end
--- end
-
 function CatchFish()
     if (isFishing) then
-        -- TriggerEvent('bixbi_fishing:minigame', function(success)
-        --     if success then
-        --         TriggerServerEvent('bixbi_fishing:Caught')
-        --     else
-        --         exports.bixbi_core:Notify('error', 'You didn\'t catch anything')
-        --     end
-        --     Cancel()
-        --     ClearPedTasks(PlayerPedId())
-        --     TriggerEvent('bixbi_fishing:Start')
-        -- end)
         local CustomSettings = {
             settings = {
                 handleEnd = false;
@@ -100,7 +73,7 @@ function Cancel()
     DeleteObject(rod)
     DeleteEntity(rod)
     ClearPedTasks(PlayerPedId())
-    ClearInterval("fishingactive")
+    ClearInterval(fishingActive)
 end
 
 function AttachEntityToPed(prop, bone_ID, x, y, z, RotX, RotY, RotZ)
@@ -113,12 +86,14 @@ end
 
 function FishingActive()
     exports.bixbi_core:Notify('', 'Press "X" to stop fishing.', 10000)
-    SetInterval("fishingactive", 0, function()
+
+    fishingActive = SetInterval(function()
         if (IsControlJustPressed(0, 73)) then
             cancelledFishing = true
             Cancel()
         end
-    end)
+    end, 0)
+    SetInterval(fishingActive, 0)
 
     Citizen.Wait(100)
     Citizen.Wait(math.random(Config.FishTime[1] * 1000, Config.FishTime[2] * 1000))
@@ -126,26 +101,6 @@ function FishingActive()
         CatchFish()
     end
   end
-
--- function DrawTextText()
---     local playerPed = PlayerPedId()
---     exports.bixbi_core:Notify('', 'Press "X" to stop fishing.', 10000)
---     while drawText do
---         if (IsControlJustPressed(0, 73)) then
---             DeleteEntity(rod)
---             DeleteObject(rod)
---             isFishing = false
---             RNG()
---             Cancel()
---             ClearPedTasks(playerPed)
---             break
---         end
---         Citizen.Wait(5)
---     end
---     while not drawText do
---         break
---     end
--- end
 
 --[[--------------------------------------------------
 Skill Check -- Credit: s_fishing
